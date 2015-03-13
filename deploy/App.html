@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Feature TreeGrid filtered by Project and Release</title>
+
+    <script type="text/javascript" src="/apps/2.0/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define("CustomApp",{extend:"Rally.app.App",componentCls:"app",items:[{xtype:"container",itemId:"ProjectFilter"},{xtype:"container",itemId:"ReleaseFilter"},{xtype:"container",itemId:"buttonContainter"},{xtype:"container",itemId:"gridContainer"}],launch:function(){var millisecondsInDay=864e5,currentDate=new Date;this._startDate=new Date(currentDate-360*millisecondsInDay).toISOString(),this._createFilterBox("Project"),this._createFilterBox("Release"),this.down("#buttonContainter").add({xtype:"rallybutton",text:"Build TreeGrid",handler:this._build,scope:this})},_createFilterBox:function(property){this.down("#"+property+"Filter").add({xtype:"rallyfieldvaluecombobox",id:property+"Combobox",model:"PortfolioItem/Feature",field:property,listeners:{ready:this._getFilter,select:this._getFilter,scope:this}})},_getFilter:function(){console.log("get filter");var filter=Ext.create("Rally.data.wsapi.Filter",{property:"LastUpdateDate",operator:">",value:this._startDate});filter=this._checkFilterStatus("Project",filter),filter=this._checkFilterStatus("Release",filter),this._filter=filter},_checkFilterStatus:function(property,filter){console.log("check status");var filterString=Ext.getCmp(property+"Combobox").getValue()+"";console.log(filterString);for(var filterArr=filterString.split(","),propertyFilter=Ext.create("Rally.data.wsapi.Filter",{property:property,operator:"=",value:filterArr[0]}),i=1;filterArr.length>i;)propertyFilter=propertyFilter.or({property:property,operator:"=",value:filterArr[i]}),i++;return filter=filter.and(propertyFilter)},_build:function(){console.log("build");var treeGrid=this.down("rallytreegrid"),that=this;treeGrid&&(console.log("destroy"),Ext.ComponentQuery.query("#gridContainer")[0].remove(Ext.ComponentQuery.query("#tree-grid")[0],!0)),Ext.create("Rally.data.wsapi.TreeStoreBuilder").build({models:["portfolioitem/feature"],autoLoad:!0,enableHierarchy:!0,filters:that._filter}).then({success:this._onStoreBuilt,scope:this})},_onStoreBuilt:function(store){console.log("on store built"),this.down("#gridContainer").add({margin:"10px 0 0 0",xtype:"rallytreegrid",itemId:"tree-grid",width:800,store:store,context:this.getContext(),columnCfgs:["Name","State","Project","PercentDoneByStoryCount","PercentDoneByStoryPlanEstimate","ScheduleState"]})}});
+
+            Rally.launchApp('CustomApp', {
+                name:"Feature TreeGrid filtered by Project and Release",
+	            parentRepos:""
+            });
+
+        });
+    </script>
+
+
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+</body>
+</html>
