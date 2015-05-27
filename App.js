@@ -100,7 +100,7 @@ Ext.define('CustomApp', {
             margin: '10px 0 0 0',
             xtype: 'rallytreegrid',
             itemId: 'tree-grid',
-            width: 800,
+            width: 1000,
             store: store,
             context: this.getContext(),
             columnCfgs: [
@@ -109,7 +109,8 @@ Ext.define('CustomApp', {
                 'Project',
                 'PercentDoneByStoryCount',
                 'PercentDoneByStoryPlanEstimate',
-                'ScheduleState'
+                'ScheduleState',
+                'PreliminaryEstimate'
             ]
         });
     }
